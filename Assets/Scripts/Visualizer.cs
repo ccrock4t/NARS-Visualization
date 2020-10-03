@@ -4,26 +4,14 @@ using UnityEngine;
 
 public class Visualizer : MonoBehaviour
 {
-    Dictionary<string, Concept> conceptTable;
-    Dictionary<string, bool> inheritTable;
+    Dictionary<string, Concept> conceptTable; //holds concepts, accessed by term
+    Dictionary<string, bool> inheritTable; //holds whether a certain inheritance exists
     Dictionary<(int, int), bool> spaceAvailableTable;
 
-    Queue<string> newConceptQueue = new Queue<string>();
-    Queue<QueuedNewInherit> newInheritQueue = new Queue<QueuedNewInherit>();
+    Queue<string> newConceptQueue = new Queue<string>(); //new concepts queued for visualization
+    Queue<(string, string)> newInheritQueue = new Queue<(string, string)>(); //new inheritances queued for visualization (subject, predicate)
 
     public GameObject conceptPrefab, inheritancePrefab;
-
-    public class QueuedNewInherit
-    {
-
-        public string Subj, Pred;
-        public QueuedNewInherit(string subj, string pred)
-        {
-            Subj = subj;
-            Pred = pred;
-        }
-
-    }
 
     // Start is called before the first frame update
     void Start()
@@ -37,15 +25,19 @@ public class Visualizer : MonoBehaviour
     {
         if (newConceptQueue.Count > 0)
         {
+            Debug.Log("Try visualize pending concept");
             string newConceptName = newConceptQueue.Dequeue();
             VisualizeNewConcept(newConceptName);
-        }else if(newInheritQueue.Count > 0)
+        }
+        
+        if(newInheritQueue.Count > 0)
         {
-            QueuedNewInherit newInherit = newInheritQueue.Peek();
-            bool success = VisualizeNewInherit(newInherit.Subj, newInherit.Pred);
-            if (success)
+            Debug.Log("Try visualize pending inheritance");
+            (string, string) newInherit = newInheritQueue.Dequeue();
+            bool success = VisualizeNewInherit(newInherit.Item1, newInherit.Item2);
+            if (!success)
             {
-                newInheritQueue.Dequeue();
+                newInheritQueue.Enqueue(newInherit);
             }
         }
     }
@@ -62,7 +54,7 @@ public class Visualizer : MonoBehaviour
     public bool VisualizeNewInherit(string subject, string predicate)
     {
         if (!(conceptTable.ContainsKey(subject) && conceptTable.ContainsKey(predicate))) return false;
-        if (inheritTable.ContainsKey(subject + "-->" + predicate)) return true;
+        if (inheritTable.ContainsKey(GetInheritanceString(subject, predicate))) return true;
 
         Transform subjGO = conceptTable[subject].transform;
         Transform predGO = conceptTable[predicate].transform;
@@ -74,22 +66,32 @@ public class Visualizer : MonoBehaviour
         positions[1] = predGO.position;
         newInheritance.GetComponent<LineRenderer>().SetPositions(positions);
 
-        inheritTable.Add(subject + "-->" + predicate, true);
-        Debug.Log("MADE INHERIT " + subject + " --> " + predicate);
+        inheritTable.Add(GetInheritanceString(subject, predicate), true);
+        Debug.Log("MADE INHERIT " + GetInheritanceString(subject, predicate));
         return true;
     }
 
     //queue the new visualization (since creating a new visualization directly from output is broken)
     public void QueueVisualizeNewInherit(string subject, string predicate)
     {
-        newInheritQueue.Enqueue(new QueuedNewInherit(subject, predicate));
+        if (!inheritTable.ContainsKey(GetInheritanceString(subject, predicate)) && !newInheritQueue.Contains((subject, predicate)))
+        {
+            Debug.Log("QUEUE INHERIT " + GetInheritanceString(subject, predicate));
+            newInheritQueue.Enqueue((subject, predicate));
+        }
     }
 
     public void QueueVisualizeNewConcept(string conceptName)
     {
         if (!conceptTable.ContainsKey(conceptName) && !newConceptQueue.Contains(conceptName))
         {
+            Debug.Log("QUEUE CONCEPT " + conceptName);
             newConceptQueue.Enqueue(conceptName);
         }
+    }
+
+    private string GetInheritanceString(string subject, string predicate)
+    {
+        return subject + NARSHost.INHERIT_STRING + predicate;
     }
 }

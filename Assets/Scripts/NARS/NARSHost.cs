@@ -24,6 +24,7 @@ public class NARSHost : MonoBehaviour
     TMP_InputField inputTextField;
 
     //output indicators
+    public static string INHERIT_STRING = "--->";
     string NEW_CONCEPT_INDICATOR = "NEW CONCEPT: ";
     string NEW_INHERIT_INDICATOR = "NEW INHERIT: ";
 
@@ -150,9 +151,9 @@ public class NARSHost : MonoBehaviour
         }
         else if (outputStr.Contains(NEW_INHERIT_INDICATOR))
         {
-            int length = outputStr.IndexOf("-->") - NEW_INHERIT_INDICATOR.Length;
+            int length = outputStr.IndexOf(INHERIT_STRING) - NEW_INHERIT_INDICATOR.Length;
             string subj = outputStr.Substring(NEW_INHERIT_INDICATOR.Length, length);
-            string pred = outputStr.Substring(outputStr.IndexOf("-->") + 3);
+            string pred = outputStr.Substring(outputStr.IndexOf(INHERIT_STRING) + INHERIT_STRING.Length);
             GetVisualizer().QueueVisualizeNewInherit(subj, pred);
         }
 
