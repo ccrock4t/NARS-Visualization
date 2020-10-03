@@ -10,7 +10,7 @@ ONA Source Code (C): https://github.com/opennars/OpenNARS-for-Applications
 Shell output format
 ------------------------------
 - New Concept added to memory: "New Concept: " + term
-- New Inheritance relation: "New Inherit: " + subject_term + "-->" + predicate_term
+- New Inheritance relation: "New Inherit: " + subject_term + "--->" + predicate_term
 
 
 Example
