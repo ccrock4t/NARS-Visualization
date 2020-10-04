@@ -19,7 +19,7 @@ Visualizer after 2 inputs:
 - <raven --> bird>.
 - <bird --> animal>.
 
-![Capture](https://user-images.githubusercontent.com/15344554/95002493-aec63c00-05a2-11eb-8f95-061b32b75bb1.PNG)
+![Capture](https://user-images.githubusercontent.com/15344554/95004949-2fdffc00-05c0-11eb-9760-78a6b12ed5a8.PNG)
 
 Gif of visualizer after 3 inputs:
 - <a --> b>.
