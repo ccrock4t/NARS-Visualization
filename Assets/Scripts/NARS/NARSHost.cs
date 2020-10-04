@@ -23,11 +23,6 @@ public class NARSHost : MonoBehaviour
 
     TMP_InputField inputTextField;
 
-    //output indicators
-    public static string INHERIT_STRING = "--->";
-    string NEW_CONCEPT_INDICATOR = "NEW CONCEPT: ";
-    string NEW_INHERIT_INDICATOR = "NEW INHERIT: ";
-
     private void Start()
     {
         Application.targetFrameRate = 60;
@@ -101,9 +96,10 @@ public class NARSHost : MonoBehaviour
         process.BeginErrorReadLine();
 
         process.StandardInput.WriteLine("java -Xmx1024m -jar opennars.jar");
-        //process.StandardInput.Flush();
+        process.StandardInput.Flush();
 
         messageStream = process.StandardInput;
+        AddInput("*volume=100");
     }
 
     public void AddInferenceCycles(int cycles)
@@ -127,7 +123,7 @@ public class NARSHost : MonoBehaviour
     {
 
         string outputStr = eventArgs.Data;
-        Debug.Log(outputStr);
+        //Debug.Log(outputStr);
         if (outputStr.Contains("EXE:")) //operation executed
         {
             int length = outputStr.IndexOf("(") - eventArgs.Data.IndexOf("^");
@@ -145,16 +141,10 @@ public class NARSHost : MonoBehaviour
 
             }
         }
-        else if(outputStr.Contains(NEW_CONCEPT_INDICATOR))
+
+        if (outputStr.Contains("OUT:"))
         {
-            GetVisualizer().QueueVisualizeNewConcept(outputStr.Substring(NEW_CONCEPT_INDICATOR.Length));
-        }
-        else if (outputStr.Contains(NEW_INHERIT_INDICATOR))
-        {
-            int length = outputStr.IndexOf(INHERIT_STRING) - NEW_INHERIT_INDICATOR.Length;
-            string subj = outputStr.Substring(NEW_INHERIT_INDICATOR.Length, length);
-            string pred = outputStr.Substring(outputStr.IndexOf(INHERIT_STRING) + INHERIT_STRING.Length);
-            GetVisualizer().QueueVisualizeNewInherit(subj, pred);
+            GetVisualizer().QueueStatement(outputStr);
         }
 
     }

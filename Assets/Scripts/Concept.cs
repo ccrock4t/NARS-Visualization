@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class Concept : MonoBehaviour
 {
-    public TextMeshPro nameText;
+    public Text _nameText;
+    [SerializeField] bool _isStatementTerm;
+    [SerializeField] bool _isCompoundTerm;
 
     // Start is called before the first frame update
     void Start()
@@ -15,7 +15,9 @@ public class Concept : MonoBehaviour
 
     public void Init(string name)
     {
-        nameText.text = name;
+        _nameText.text = name;
+        _isStatementTerm = NarseseParser.ContainsStatementCopula(name);
+        _isCompoundTerm = NarseseParser.ContainsTermConnector(name);
     }
 
     // Update is called once per frame
@@ -23,4 +25,15 @@ public class Concept : MonoBehaviour
     {
         
     }
+
+    public bool isStatementTerm()
+    {
+        return _isStatementTerm;
+    }
+
+    public bool isCompoundTerm()
+    {
+        return _isCompoundTerm;
+    }
+
 }
