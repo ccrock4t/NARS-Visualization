@@ -8,6 +8,9 @@ public class Concept : MonoBehaviour
     [SerializeField] bool _isStatementTerm;
     [SerializeField] bool _isCompoundTerm;
 
+    private float FIRE_MAX_TIMER = 1.0f;
+    private float fireTimer = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +28,11 @@ public class Concept : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(fireTimer > 0f)
+        {
+            fireTimer -= Time.deltaTime;
+            this.GetComponent<MeshRenderer>().material.color = new Color((FIRE_MAX_TIMER - fireTimer)/FIRE_MAX_TIMER, 1, 1);
+        }
     }
 
     public bool isStatementTerm()
@@ -36,6 +43,19 @@ public class Concept : MonoBehaviour
     public bool isCompoundTerm()
     {
         return _isCompoundTerm;
+    }
+
+    public void Fire()
+    {
+        Grow();
+        this.GetComponent<MeshRenderer>().material.color = Color.cyan;
+        fireTimer = FIRE_MAX_TIMER;
+    }
+
+    public void Grow()
+    {
+        Transform conceptSprite = this.transform;
+        conceptSprite.localScale += new Vector3(1f, 1f, 1f)* .01f;
     }
 
 }

@@ -14,12 +14,7 @@ public class CameraScript : MonoBehaviour
         //zoom
         if(Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-            transform.Translate(new Vector3(0,0,Input.GetAxis("Mouse ScrollWheel")*5f*Mathf.Abs(Camera.main.transform.position.z)), Space.World);
-        }
-
-        if(Camera.main.transform.position.z >= 0f)
-        {
-            Camera.main.transform.position += new Vector3(0, 0, -.5f);
+            transform.Translate(new Vector3(0,0,Input.GetAxis("Mouse ScrollWheel")*5f*Mathf.Abs(Camera.main.transform.position.z)));
         }
 
         //drag
@@ -34,7 +29,7 @@ public class CameraScript : MonoBehaviour
         Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
         Vector3 move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
 
-        transform.Translate(move, Space.World);
+        transform.Translate(move);
     }
 
     

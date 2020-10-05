@@ -71,7 +71,7 @@ public class Visualizer : NarseseParser
             }
         }
 
-        MoveTermLinksTogether();
+        //MoveTermLinksTogether();
         UpdateShowHideVisualization();
     }
 
@@ -219,7 +219,7 @@ public class Visualizer : NarseseParser
     public void VisualizeNewConcept(string conceptName)
     {
 
-        Vector3 offset = new Vector3(Random.Range(-10f - conceptTable.Count / 10f, 10f + conceptTable.Count/10f), Random.Range(-10f - conceptTable.Count / 10f, 10f + conceptTable.Count / 10f), 0f);
+        Vector3 offset = new Vector3(Random.Range(-10f - conceptTable.Count / 10f, 10f + conceptTable.Count/10f), Random.Range(-10f - conceptTable.Count / 10f, 10f + conceptTable.Count / 10f), Random.Range(-10f - conceptTable.Count / 10f, 10f + conceptTable.Count / 10f));
 
         GameObject newConceptGO = Instantiate(conceptPrefab, offset, Quaternion.identity);
         Concept newConcept = newConceptGO.GetComponent<Concept>();
@@ -298,8 +298,7 @@ public class Visualizer : NarseseParser
             newConceptQueue.Enqueue(conceptName);
         }else if (conceptTable.ContainsKey(conceptName))
         {
-            Transform conceptSprite = conceptTable[conceptName].transform;
-            conceptSprite.localScale += new Vector3(.1f, .1f, 0f);
+            conceptTable[conceptName].Fire();
         }
     }
 
@@ -398,6 +397,7 @@ public class Visualizer : NarseseParser
         if (parsedStatement.type == Statement.StatementType.Inheritance)
         {
             statementKey = GetInheritanceString(subjectPredicate);
+            QueueVisualizeNewConcept(statementKey);
             if (inheritTable.ContainsKey(statementKey) && inheritTable[statementKey].GetTruthValue().GetHashCode() == truthValue.GetHashCode()) { return; }
 
             QueueVisualizeNewInherit(parsedStatement);
@@ -405,6 +405,8 @@ public class Visualizer : NarseseParser
         else if (parsedStatement.type == Statement.StatementType.Similarity)
         {
             statementKey = GetSimilarityString(subjectPredicate);
+            QueueVisualizeNewConcept(statementKey);
+
             Statement parsedReverseStatement = NarseseParser.GetReverseStatement(statement);
 
             string forwardStatementKey = GetInheritanceString(subjectPredicate);
@@ -421,7 +423,7 @@ public class Visualizer : NarseseParser
             return;
         }
 
-        QueueVisualizeNewConcept(statementKey);
+        
     }
 
     private string GetInheritanceString(SubjectPredicate subjectPredicate)
