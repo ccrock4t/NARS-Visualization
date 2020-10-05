@@ -19,5 +19,5 @@ Gif of visualizer after 3 inputs:
 - <a --> b>.
 - <b --> c>.
 - <c --> d>.
-![Gif](https://user-images.githubusercontent.com/15344554/95006963-10ed6400-05d8-11eb-95ea-cf7fd12731b6.gif)
+![gif](https://user-images.githubusercontent.com/15344554/95037538-663d7a00-0699-11eb-990f-5712ae4832b0.gif)
 
