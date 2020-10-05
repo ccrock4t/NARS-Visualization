@@ -15,7 +15,7 @@ Visualizer after 2 inputs:
 
 ![Capture](https://user-images.githubusercontent.com/15344554/95004949-2fdffc00-05c0-11eb-9760-78a6b12ed5a8.PNG)
 
-Gif of visualizer after 3 inputs:
+Visualizer after 3 inputs:
 - <a --> b>.
 - <b --> c>.
 - <c --> d>.
