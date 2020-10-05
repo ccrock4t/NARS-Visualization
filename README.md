@@ -13,11 +13,12 @@ Visualizer after 2 inputs:
 - <raven --> bird>.
 - <bird --> animal>.
 
-![Capture](https://user-images.githubusercontent.com/15344554/95004949-2fdffc00-05c0-11eb-9760-78a6b12ed5a8.PNG)
+![Capture](https://user-images.githubusercontent.com/15344554/95098565-da5d3980-06fc-11eb-9e68-f355d48ad206.PNG)
 
 Visualizer after 3 inputs:
 - <a --> b>.
 - <b --> c>.
 - <c --> d>.
-![gif](https://user-images.githubusercontent.com/15344554/95037538-663d7a00-0699-11eb-990f-5712ae4832b0.gif)
+![gif](https://user-images.githubusercontent.com/15344554/95098354-9702cb00-06fc-11eb-951f-d86135b2bdab.gif)
+
 
