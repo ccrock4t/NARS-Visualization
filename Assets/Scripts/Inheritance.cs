@@ -6,6 +6,7 @@ public class Inheritance : MonoBehaviour
 {
     NarseseParser.TruthValue _truthValue;
     Concept _subject, _predicate;
+    bool _initialized;
 
     // Start is called before the first frame update
     void Start()
@@ -16,7 +17,10 @@ public class Inheritance : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (_initialized)
+        {
+            UpdatePositions();
+        }
     }
 
     public void Init(NarseseParser.TruthValue truthVal, Concept subject, Concept predicate)
@@ -26,6 +30,8 @@ public class Inheritance : MonoBehaviour
         _predicate = predicate;
 
         DrawInheritance();
+
+        _initialized = true;
     }
 
     public NarseseParser.TruthValue GetTruthValue()
@@ -43,12 +49,17 @@ public class Inheritance : MonoBehaviour
         return _subject.isCompoundTerm() || _predicate.isCompoundTerm();
     }
 
-    private void DrawInheritance()
+    private void UpdatePositions()
     {
         Vector3[] positions = new Vector3[2];
         positions[0] = _subject.transform.position;
         positions[1] = _predicate.transform.position;
         this.gameObject.GetComponent<LineRenderer>().SetPositions(positions);
+    }
+
+    private void DrawInheritance()
+    {
+        UpdatePositions();
 
         Color startColor = this.gameObject.GetComponent<LineRenderer>().startColor;
         Color endColor = this.gameObject.GetComponent<LineRenderer>().endColor;

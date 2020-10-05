@@ -44,7 +44,7 @@ public class NARSHost : MonoBehaviour
 
 
 
-    private Visualizer GetVisualizer()
+    public Visualizer GetVisualizer()
     {
         return _visualizer;
     }
@@ -100,6 +100,7 @@ public class NARSHost : MonoBehaviour
 
         messageStream = process.StandardInput;
         AddInput("*volume=100");
+        AddInput("*threads_amount=6");
     }
 
     public void AddInferenceCycles(int cycles)
@@ -115,7 +116,7 @@ public class NARSHost : MonoBehaviour
 
     public void AddInput(string message)
     {
-        //Debug.Log("SENDING INPUT: " + message);
+        Debug.Log("SENDING INPUT: " + message);
 
         messageStream.WriteLine(message);
     }

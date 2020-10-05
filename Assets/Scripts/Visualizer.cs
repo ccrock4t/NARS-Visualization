@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,20 +6,23 @@ public class Visualizer : NarseseParser
 {
     Dictionary<string, Concept> conceptTable; //holds concepts, accessed by term
     Dictionary<string, Inheritance> inheritTable; //holds whether a certain inheritance exists
+    Dictionary<Concept, Queue<Concept>> termLinkTable; //holds whether a certain termlink exists
 
     Queue<string> newStatementQueue = new Queue<string>(); //new statements to parse
     Queue<string> newConceptQueue = new Queue<string>(); //new concepts queued for visualization
     Queue<Statement> newInheritQueue = new Queue<Statement>(); //new inheritances queued for visualization (subject, predicate)
+    Queue<Statement> newTermLinkQueue = new Queue<Statement>(); //new statements to parse
 
-    public GameObject conceptPrefab, inheritancePrefab;
+    public GameObject conceptPrefab, inheritancePrefab, termLinkPrefab;
 
-    public Text hideShowStatementTermsBtnTxt, hideShowCompoundTermsBtnTxt;
+    Text hideShowStatementTermsBtnTxt, hideShowCompoundTermsBtnTxt;
 
     // Start is called before the first frame update
     void Start()
     {
         conceptTable = new Dictionary<string, Concept>();
         inheritTable = new Dictionary<string, Inheritance>();
+        termLinkTable = new Dictionary<Concept, Queue<Concept>>();
 
         hideShowStatementTermsBtnTxt = GameObject.Find("HideShowStatementTermsBtnTxt").GetComponent<Text>();
         hideShowCompoundTermsBtnTxt = GameObject.Find("HideShowCompoundTermsBtnTxt").GetComponent<Text>();
@@ -46,8 +48,8 @@ public class Visualizer : NarseseParser
             string newConceptName = newConceptQueue.Dequeue();
             VisualizeNewConcept(newConceptName);
         }
-        
-        if(newInheritQueue.Count > 0)
+
+        if (newInheritQueue.Count > 0)
         {
             Debug.Log("Try visualize pending inheritance");
             Statement newInherit = newInheritQueue.Dequeue();
@@ -58,7 +60,37 @@ public class Visualizer : NarseseParser
             }
         }
 
-        UpdateVisualization();
+        if (newTermLinkQueue.Count > 0)
+        {
+            Debug.Log("Try visualize pending inheritance");
+            Statement newInherit = newTermLinkQueue.Dequeue();
+            bool success = VisualizeNewTermLink(newInherit);
+            if (!success)
+            {
+                newInheritQueue.Enqueue(newInherit);
+            }
+        }
+
+        MoveTermLinksTogether();
+        UpdateShowHideVisualization();
+    }
+
+    public void MoveTermLinksTogether()
+    {
+        foreach (KeyValuePair<Concept, Queue<Concept>> entry in termLinkTable)
+        {
+            foreach (Concept concept in entry.Value)
+            {
+                entry.Key.transform.position = Vector3.MoveTowards(entry.Key.transform.position, concept.transform.position, .001f);
+                concept.transform.position = Vector3.MoveTowards(concept.transform.position, entry.Key.transform.position, .001f);
+            }
+        }
+    }
+
+    public Concept GetConcept(string conceptName)
+    {
+        if (conceptTable.ContainsKey(conceptName)) return conceptTable[conceptName];
+        return null;
     }
 
     //Show/Hide options
@@ -68,7 +100,7 @@ public class Visualizer : NarseseParser
     string STATEMENT_STR = "statement terms";
     string COMPOUND_STR = "compound terms";
 
-    public void UpdateVisualization()
+    public void UpdateShowHideVisualization()
     {
         if (_updateVisualization)
         {
@@ -193,10 +225,14 @@ public class Visualizer : NarseseParser
         Concept newConcept = newConceptGO.GetComponent<Concept>();
         newConcept.Init(conceptName);
 
-        if (newConcept.isStatementTerm() && _areStatementTermsHidden)
+        if (newConcept.isStatementTerm())
         {
-            newConceptGO.SetActive(false);
+            if(_areStatementTermsHidden)
+                newConceptGO.SetActive(false);
+
+            QueueVisualizeNewTermLink(new Statement(conceptName + "%1;1%"), newConcept);
         }
+
 
         if (newConcept.isCompoundTerm() && _areCompoundTermsHidden)
         {
@@ -265,6 +301,78 @@ public class Visualizer : NarseseParser
             Transform conceptSprite = conceptTable[conceptName].transform;
             conceptSprite.localScale += new Vector3(.1f, .1f, 0f);
         }
+    }
+
+    public void QueueVisualizeNewTermLink(Statement statement, Concept statementConcept)
+    {
+        if (!termLinkTable.ContainsKey(statementConcept) && !newTermLinkQueue.Contains(statement))
+        {
+            newTermLinkQueue.Enqueue(statement);
+        }
+    }
+
+
+    //queue the new visualization (since creating a new visualization directly from output is broken)
+    //returns success
+    public bool VisualizeNewTermLink(Statement statement)
+    {
+        string statementKey = GetInheritanceString(statement.subjectPredicate);
+        if (!conceptTable.ContainsKey(statementKey)) { return false; }
+        Concept statementConcept = conceptTable[statementKey];
+
+        if (conceptTable.ContainsKey(statement.subjectPredicate._subject) && conceptTable.ContainsKey(statement.subjectPredicate._predicate)) {
+            Concept subjectConcept = conceptTable[statement.subjectPredicate._subject];
+            Concept predicateConcept = conceptTable[statement.subjectPredicate._predicate];
+
+            if (!termLinkTable.ContainsKey(statementConcept)) { 
+                Queue<Concept> links = new Queue<Concept>();
+                termLinkTable.Add(statementConcept, links);
+            }
+
+            if (!termLinkTable.ContainsKey(subjectConcept))
+            {
+                Queue<Concept> links = new Queue<Concept>();
+                termLinkTable.Add(subjectConcept, links);
+            }
+
+            if (!termLinkTable.ContainsKey(predicateConcept))
+            {
+                Queue<Concept> links = new Queue<Concept>();
+                termLinkTable.Add(predicateConcept, links);
+            }
+
+            if (!termLinkTable[statementConcept].Contains(subjectConcept))
+            {
+                termLinkTable[statementConcept].Enqueue(subjectConcept);
+            }
+
+            if (!termLinkTable[subjectConcept].Contains(statementConcept))
+            {
+                termLinkTable[subjectConcept].Enqueue(statementConcept);
+            }
+
+            if (!termLinkTable[statementConcept].Contains(predicateConcept))
+            {
+                termLinkTable[statementConcept].Enqueue(predicateConcept);
+            }
+
+            if (!termLinkTable[predicateConcept].Contains(statementConcept))
+            {
+                termLinkTable[predicateConcept].Enqueue(statementConcept);
+            }
+
+            GameObject newTermLinkGO = Instantiate(termLinkPrefab);
+            TermLink termLink = newTermLinkGO.GetComponent<TermLink>();
+            termLink.Init(statementConcept, subjectConcept);
+
+            GameObject newTermLinkGO2 = Instantiate(termLinkPrefab);
+            TermLink termLink2 = newTermLinkGO2.GetComponent<TermLink>();
+            termLink2.Init(statementConcept, predicateConcept);
+
+            return true;
+        }
+
+        return false;
     }
 
     public void QueueStatement(string statement)

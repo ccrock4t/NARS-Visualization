@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class Concept : MonoBehaviour
 {
+    public string _name;
     public Text _nameText;
     [SerializeField] bool _isStatementTerm;
     [SerializeField] bool _isCompoundTerm;
@@ -15,6 +16,7 @@ public class Concept : MonoBehaviour
 
     public void Init(string name)
     {
+        _name = name;
         _nameText.text = name;
         _isStatementTerm = NarseseParser.ContainsStatementCopula(name);
         _isCompoundTerm = NarseseParser.ContainsTermConnector(name);

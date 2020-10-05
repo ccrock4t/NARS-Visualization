@@ -46,7 +46,7 @@ public class NarseseParser : MonoBehaviour
             Debug.Log("parsing statement " + statement);
 
             int indexOfStart = statement.IndexOf("<") + 1;
-            int indexOfEnd = statement.LastIndexOf(">.");
+            int indexOfEnd = statement.LastIndexOf(">");
             string subject = statement.Substring(indexOfStart, indexOfCopula - indexOfStart).Trim(' ');
             string predicate = statement.Substring(indexOfCopula + copulaLength, indexOfEnd - (indexOfCopula + copulaLength)).Trim(' ');
 
